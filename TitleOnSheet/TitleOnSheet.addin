@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>TitleOnSheet - Command 1</Text>
+    <Description>Some description</Description>
+    <Assembly>TitleOnSheet\TitleOnSheet.dll</Assembly>
+    <FullClassName>TitleOnSheet.Command1</FullClassName>
+    <ClientId>530c6d6f-10c5-408a-ae88-e047f1beccc6</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+  <AddIn Type="Command">
+    <Text>TitleOnSheet - Command 2</Text>
+    <Description>Some description</Description>
+    <Assembly>TitleOnSheet\TitleOnSheet.dll</Assembly>
+    <FullClassName>TitleOnSheet.Command2</FullClassName>
+    <ClientId>4fe2bcaf-59eb-4f25-aff7-ea0b1d43b857</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>TitleOnSheet</Name>
+    <Assembly>TitleOnSheet\TitleOnSheet.dll</Assembly>
+    <FullClassName>TitleOnSheet.App</FullClassName>
+    <ClientId>fbfb4402-3be5-47c8-a3e5-517ee1eadd79</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+</RevitAddIns>
