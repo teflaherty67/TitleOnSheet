@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace TitleOnSheet
 {
@@ -7,15 +9,10 @@ namespace TitleOnSheet
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            // Revit application and document variables
-            UIApplication uiapp = commandData.Application;
-            UIDocument uidoc = uiapp.ActiveUIDocument;
-            Document doc = uidoc.Document;
+            Document doc = commandData.Application.ActiveUIDocument.Document;
 
-            ry
+            try
             {
-                Document doc = commandData.Application.ActiveUIDocument.Document;
-
                 // 1. Find string
                 var findDlg = new InputDialog("Find and Replace: Title on Sheet", "Find what:");
                 if (findDlg.ShowDialog() != true) return Result.Cancelled;
@@ -121,9 +118,8 @@ namespace TitleOnSheet
 
         internal static PushButtonData GetButtonData()
         {
-            // use this method to define the properties for this command in the Revit ribbon
             string buttonInternalName = "btnCommand1";
-            string buttonTitle = "Button 1";
+            string buttonTitle = "Find & Replace";
 
             Common.ButtonDataClass myButtonData = new Common.ButtonDataClass(
                 buttonInternalName,
@@ -131,10 +127,9 @@ namespace TitleOnSheet
                 MethodBase.GetCurrentMethod().DeclaringType?.FullName,
                 Properties.Resources.Blue_32,
                 Properties.Resources.Blue_16,
-                "This is a tooltip for Button 1");
+                "Find and replace text in the Title on Sheet parameter");
 
             return myButtonData.Data;
         }
     }
-
 }
