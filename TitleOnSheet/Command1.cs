@@ -21,42 +21,43 @@ namespace TitleOnSheet
 
                 string findText = dlg.FindText;
                 string replaceText = dlg.ReplaceText;
-                string pattern = Regex.Escape(findText);
+
+                var regexOptions = RegexOptions.None;
+                if (!dlg.MatchCase) regexOptions |= RegexOptions.IgnoreCase;
+
+                string pattern = dlg.MatchWholeWord
+                    ? $@"\b{Regex.Escape(findText)}\b"
+                    : Regex.Escape(findText);
 
                 var hits = new List<(Element element, BuiltInParameter param, string newValue)>();
 
-                // Collect views placed on sheets for View Name and/or Title on Sheet
+                // Collect views for View Name and/or Title on Sheet
                 if (dlg.ReplaceViewName || dlg.ReplaceTitleOnSheet)
                 {
-                    var viewIds = GetViewsOnSheets(doc);
+                    var viewIds = GetViewIds(doc, uidoc, dlg.Scope);
                     foreach (ElementId id in viewIds)
                     {
                         if (!(doc.GetElement(id) is View v)) continue;
 
                         if (dlg.ReplaceViewName)
-                            AddHit(v, BuiltInParameter.VIEW_NAME, pattern, replaceText, hits);
+                            AddHit(v, BuiltInParameter.VIEW_NAME, pattern, replaceText, regexOptions, hits);
 
                         if (dlg.ReplaceTitleOnSheet)
-                            AddHit(v, BuiltInParameter.VIEW_DESCRIPTION, pattern, replaceText, hits);
+                            AddHit(v, BuiltInParameter.VIEW_DESCRIPTION, pattern, replaceText, regexOptions, hits);
                     }
                 }
 
                 // Collect sheets for Sheet Name
                 if (dlg.ReplaceSheetName)
                 {
-                    var sheets = new FilteredElementCollector(doc)
-                        .OfClass(typeof(ViewSheet))
-                        .Cast<ViewSheet>()
-                        .Where(s => !s.IsPlaceholder);
-
+                    var sheets = GetSheets(doc, uidoc, dlg.Scope);
                     foreach (ViewSheet sheet in sheets)
-                        AddHit(sheet, BuiltInParameter.SHEET_NAME, pattern, replaceText, hits);
+                        AddHit(sheet, BuiltInParameter.SHEET_NAME, pattern, replaceText, regexOptions, hits);
                 }
 
                 if (hits.Count == 0)
                 {
-                    TaskDialog.Show("Find and Replace",
-                        $"No matches found for \"{findText}\".");
+                    TaskDialog.Show("Find and Replace", $"No matches found for \"{findText}\".");
                     return Result.Succeeded;
                 }
 
@@ -64,7 +65,7 @@ namespace TitleOnSheet
                 var confirm = new TaskDialog("Find and Replace: Confirm")
                 {
                     MainInstruction = $"Update {hits.Count} parameter value(s)?",
-                    MainContent = $"Find: \"{findText}\"\nReplace with: \"{replaceText}\"\n\nMatch is case insensitive.",
+                    MainContent = $"Find: \"{findText}\"\nReplace with: \"{replaceText}\"\n\nMatch is case {(dlg.MatchCase ? "sensitive" : "insensitive")}.",
                     CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No,
                     DefaultButton = TaskDialogResult.Yes
                 };
@@ -97,14 +98,10 @@ namespace TitleOnSheet
             }
         }
 
-        private static HashSet<ElementId> GetViewsOnSheets(Document doc)
+        private static HashSet<ElementId> GetViewIds(Document doc, UIDocument uidoc, SearchScope scope)
         {
             var viewIds = new HashSet<ElementId>();
-
-            var sheets = new FilteredElementCollector(doc)
-                .OfClass(typeof(ViewSheet))
-                .Cast<ViewSheet>()
-                .Where(s => !s.IsPlaceholder);
+            var sheets = GetSheets(doc, uidoc, scope);
 
             foreach (ViewSheet sheet in sheets)
             {
@@ -128,18 +125,42 @@ namespace TitleOnSheet
             return viewIds;
         }
 
+        private static IEnumerable<ViewSheet> GetSheets(Document doc, UIDocument uidoc, SearchScope scope)
+        {
+            switch (scope)
+            {
+                case SearchScope.CurrentView:
+                    if (uidoc.ActiveView is ViewSheet activeSheet)
+                        return new[] { activeSheet };
+                    return Enumerable.Empty<ViewSheet>();
+
+                case SearchScope.CurrentSelection:
+                    return uidoc.Selection.GetElementIds()
+                        .Select(id => doc.GetElement(id))
+                        .OfType<ViewSheet>()
+                        .Where(s => !s.IsPlaceholder);
+
+                default: // EntireProject
+                    return new FilteredElementCollector(doc)
+                        .OfClass(typeof(ViewSheet))
+                        .Cast<ViewSheet>()
+                        .Where(s => !s.IsPlaceholder);
+            }
+        }
+
         private static void AddHit(
             Element element,
             BuiltInParameter param,
             string pattern,
             string replaceText,
+            RegexOptions regexOptions,
             List<(Element, BuiltInParameter, string)> hits)
         {
             Parameter p = element.get_Parameter(param);
             if (p == null || p.IsReadOnly || p.StorageType != StorageType.String) return;
 
             string current = p.AsString() ?? string.Empty;
-            string updated = Regex.Replace(current, pattern, replaceText, RegexOptions.IgnoreCase);
+            string updated = Regex.Replace(current, pattern, replaceText, regexOptions);
             if (!string.Equals(updated, current, StringComparison.Ordinal))
                 hits.Add((element, param, updated));
         }

@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Height="260"
-        Width="400"
-        MinWidth="400"
-        MinHeight="260"
+        Height="390"
+        Width="420"
+        MinWidth="420"
+        MinHeight="390"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -39,6 +39,25 @@
                                 <Setter Property="Background" Value="#9CA3AF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#2B5A8E"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   TextDecorations="Underline"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -112,19 +131,52 @@
                         <RowDefinition Height="25"/>
                         <RowDefinition Height="25"/>
                         <RowDefinition Height="25"/>
-                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="22"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
                         <RowDefinition Height="25"/>
                         <RowDefinition Height="8"/>
                         <RowDefinition Height="25"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
 
-                    <CheckBox x:Name="cbxViewName"       Grid.Row="0" Content="View Name"      VerticalAlignment="Center" FontSize="11"/>
-                    <CheckBox x:Name="cbxTitleOnSheet"   Grid.Row="1" Content="Title on Sheet" VerticalAlignment="Center" FontSize="11"/>
-                    <CheckBox x:Name="cbxSheetName"      Grid.Row="2" Content="Sheet Name"     VerticalAlignment="Center" FontSize="11"/>
+                    <!-- Parameter Checkboxes -->
+                    <CheckBox x:Name="cbxViewName"     Grid.Row="0" Content="View Name"      VerticalAlignment="Center" FontSize="11"/>
+                    <CheckBox x:Name="cbxTitleOnSheet" Grid.Row="1" Content="Title on Sheet" VerticalAlignment="Center" FontSize="11"/>
+                    <CheckBox x:Name="cbxSheetName"    Grid.Row="2" Content="Sheet Name"     VerticalAlignment="Center" FontSize="11"/>
+
+                    <!-- Check All / Check None -->
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Check All"  Style="{StaticResource LinkButton}" Click="CheckAll_Click"  Margin="0,0,8,0"/>
+                        <TextBlock Text="|" Foreground="#9CA3AF" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <Button Content="Check None" Style="{StaticResource LinkButton}" Click="CheckNone_Click"/>
+                    </StackPanel>
+
+                    <!-- Scope + Match Options -->
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="160"/>
+                        </Grid.ColumnDefinitions>
+
+                        <GroupBox Grid.Column="0" Header="Scope" FontSize="11" Padding="5,4,5,4">
+                            <StackPanel>
+                                <RadioButton x:Name="rbCurrentSelection" Content="Current selection" FontSize="11" IsEnabled="False" Margin="0,2"/>
+                                <RadioButton x:Name="rbCurrentView"      Content="Current view"      FontSize="11" Margin="0,2"/>
+                                <RadioButton x:Name="rbEntireProject"    Content="Entire project"    FontSize="11" Margin="0,2" IsChecked="True"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                            <CheckBox x:Name="cbxMatchCase"      Content="Match case"           FontSize="11" Margin="0,0,0,8"/>
+                            <CheckBox x:Name="cbxMatchWholeWord" Content="Match whole word only" FontSize="11"/>
+                        </StackPanel>
+                    </Grid>
 
                     <!-- Find -->
-                    <Grid Grid.Row="4">
+                    <Grid Grid.Row="7">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="90"/>
                             <ColumnDefinition Width="*"/>
@@ -134,7 +186,7 @@
                     </Grid>
 
                     <!-- Replace -->
-                    <Grid Grid.Row="6">
+                    <Grid Grid.Row="9">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="90"/>
                             <ColumnDefinition Width="*"/>
@@ -144,7 +196,7 @@
                     </Grid>
 
                     <!-- Buttons -->
-                    <StackPanel Grid.Row="7"
+                    <StackPanel Grid.Row="11"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom">

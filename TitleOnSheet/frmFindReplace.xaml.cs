@@ -3,6 +3,8 @@ using System.Windows.Input;
 
 namespace TitleOnSheet
 {
+    public enum SearchScope { CurrentSelection, CurrentView, EntireProject }
+
     public partial class frmFindReplace : Window
     {
         public string FindText { get; private set; }
@@ -10,6 +12,9 @@ namespace TitleOnSheet
         public bool ReplaceViewName { get; private set; }
         public bool ReplaceTitleOnSheet { get; private set; }
         public bool ReplaceSheetName { get; private set; }
+        public SearchScope Scope { get; private set; }
+        public bool MatchCase { get; private set; }
+        public bool MatchWholeWord { get; private set; }
 
         public frmFindReplace()
         {
@@ -19,6 +24,20 @@ namespace TitleOnSheet
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
+        }
+
+        private void CheckAll_Click(object sender, RoutedEventArgs e)
+        {
+            cbxViewName.IsChecked = true;
+            cbxTitleOnSheet.IsChecked = true;
+            cbxSheetName.IsChecked = true;
+        }
+
+        private void CheckNone_Click(object sender, RoutedEventArgs e)
+        {
+            cbxViewName.IsChecked = false;
+            cbxTitleOnSheet.IsChecked = false;
+            cbxSheetName.IsChecked = false;
         }
 
         private void btnOK_Click(object sender, RoutedEventArgs e)
@@ -48,6 +67,15 @@ namespace TitleOnSheet
             ReplaceViewName = cbxViewName.IsChecked == true;
             ReplaceTitleOnSheet = cbxTitleOnSheet.IsChecked == true;
             ReplaceSheetName = cbxSheetName.IsChecked == true;
+            MatchCase = cbxMatchCase.IsChecked == true;
+            MatchWholeWord = cbxMatchWholeWord.IsChecked == true;
+
+            if (rbCurrentSelection.IsChecked == true)
+                Scope = SearchScope.CurrentSelection;
+            else if (rbCurrentView.IsChecked == true)
+                Scope = SearchScope.CurrentView;
+            else
+                Scope = SearchScope.EntireProject;
 
             DialogResult = true;
             Close();
