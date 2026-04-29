@@ -4,7 +4,7 @@
     <Text>TitleOnSheet - Command 1</Text>
     <Description>Some description</Description>
     <Assembly>TitleOnSheet\TitleOnSheet.dll</Assembly>
-    <FullClassName>TitleOnSheet.Command1</FullClassName>
+    <FullClassName>TitleOnSheet.cmdFindReplace</FullClassName>
     <ClientId>530c6d6f-10c5-408a-ae88-e047f1beccc6</ClientId>
     <VendorId>com.YOUR COMPANY NAME</VendorId>
     <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
